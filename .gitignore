@@ -6,3 +6,4 @@ Solid_Principles
 x64
 *.obj
 *.exe
+.vscode/settings.json

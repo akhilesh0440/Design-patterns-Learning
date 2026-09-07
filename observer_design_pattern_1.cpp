@@ -2,59 +2,78 @@
 #include <iostream>
 #include <forward_list>
 
-class Observer
+// Abstract class which we derive from
+//  "Base class"
+class IObserver
 {
 public:
-	Observer(std::string name) : mName(name) {}
+	virtual ~IObserver() {}
+	virtual void OnNotify() = 0;
+};
 
-	void OnNotify()
+// Concrete implementation of our IIObserver
+class Watcher : public IObserver
+{
+public:
+	explicit Watcher(const std::string &name) : mName(name) {}
+
+	void OnNotify() override
 	{
-		std::cout << mName << " says Hello!" << std::endl;
+		std::cout << "watcher-" << mName << std::endl;
 	}
 
 private:
 	std::string mName;
 };
 
-class Subject
+class ISubject
 {
 public:
-	void AddObserver(Observer *observer)
+	virtual ~ISubject() {}
+	void AddIObserver(IObserver *IObserver)
 	{
-		mObservers.push_front(observer);
+		mIObservers.push_front(IObserver);
 	}
 
-	void REmoveObervers(Observer *observer)
+	void REmoveObervers(IObserver *IObserver)
 	{
-		mObservers.remove(observer);
+		mIObservers.remove(IObserver);
 	}
 
 	void NotifyAll()
 	{
-		for (auto &o : mObservers)
+		for (auto &o : mIObservers)
 		{
 			o->OnNotify();
 		}
 	}
 
 private:
-	std::forward_list<Observer *> mObservers;
+	std::forward_list<IObserver *> mIObservers;
+};
+
+class SomeSubject : public ISubject
+{
+public:
 };
 
 int main()
 {
-	Subject subject;
+	SomeSubject subject;
 
-	Observer observer1("observer-1");
-	Observer observer2("observer-2");
-	Observer observer3("observer-3");
+	std::string name;
+	int i;
 
-	subject.AddObserver(&observer1);
-	subject.AddObserver(&observer2);
-	subject.AddObserver(&observer3);
+	Watcher watcher1("Watecher-1");
+	Watcher watcher2("Watecher-2");
+	Watcher watcher3("Watecher-3");
+
+	subject.AddIObserver(&watcher1);
+	subject.AddIObserver(&watcher2);
+	subject.AddIObserver(&watcher3);
 
 	subject.NotifyAll();
-	subject.REmoveObervers(&observer3);
+	subject.REmoveObervers(&watcher3);
 	std::cout << std::endl;
 
 	subject.NotifyAll();
