@@ -4,3 +4,5 @@
 *.user
 Solid_Principles
 x64
+*.obj
+*.exe
