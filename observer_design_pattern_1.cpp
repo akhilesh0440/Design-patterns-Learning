@@ -11,21 +11,6 @@ public:
 	virtual void OnNotify() = 0;
 };
 
-// Concrete implementation of our IIObserver
-class Watcher : public IObserver
-{
-public:
-	explicit Watcher(const std::string &name) : mName(name) {}
-
-	void OnNotify() override
-	{
-		std::cout << "watcher-" << mName << std::endl;
-	}
-
-private:
-	std::string mName;
-};
-
 class ISubject
 {
 public:
@@ -52,6 +37,30 @@ private:
 	std::forward_list<IObserver *> mIObservers;
 };
 
+// Concrete implementation of our IIObserver
+class Watcher : public IObserver
+{
+public:
+	explicit Watcher(ISubject &subject, const std::string &name) : mSubject(subject), mName(name)
+	{
+		mSubject.AddIObserver(this);
+	}
+
+	~Watcher()
+	{
+		mSubject.REmoveObervers(this);
+	}
+
+	void OnNotify() override
+	{
+		std::cout << "watcher-" << mName << std::endl;
+	}
+
+private:
+	std::string mName;
+	ISubject &mSubject;
+};
+
 class SomeSubject : public ISubject
 {
 public:
@@ -64,16 +73,19 @@ int main()
 	std::string name;
 	int i;
 
-	Watcher watcher1("Watecher-1");
-	Watcher watcher2("Watecher-2");
-	Watcher watcher3("Watecher-3");
+	Watcher watcher1(subject, "Watecher-1");
+	Watcher watcher2(subject, "Watecher-2");
+	{
+		Watcher watcher3(subject, "Watecher-3");
 
-	subject.AddIObserver(&watcher1);
-	subject.AddIObserver(&watcher2);
-	subject.AddIObserver(&watcher3);
+		// 	subject.AddIObserver(&watcher1);
+		// 	subject.AddIObserver(&watcher2);
+		// 	subject.AddIObserver(&watcher3);
+	}
 
 	subject.NotifyAll();
-	subject.REmoveObervers(&watcher3);
+
+	// subject.REmoveObervers(&watcher3);
 	std::cout << std::endl;
 
 	subject.NotifyAll();
